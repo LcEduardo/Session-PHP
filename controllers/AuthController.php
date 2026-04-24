@@ -40,10 +40,14 @@ class AuthController
             return;
         }
 
+        // como em index.php eu iniciei a sessão e chamei esse método ele já usou nessa requisição
+        $_SESSION['user_id'] = $user->getId();
+        $_SESSION['user_name'] = $user->getName();
+
         // ✅ LOGIN VÁLIDO
         // >>> IMPLEMENTE A SESSÃO AQUI <<<
         // Sugestão:
-        //   session_start();
+        //   
         //   $_SESSION['user_id']   = $user->getId();
         //   $_SESSION['user_name'] = $user->getName();
 
@@ -53,17 +57,13 @@ class AuthController
 
     public function dashboard(): void
     {
-        // >>> IMPLEMENTE A VERIFICAÇÃO DE SESSÃO AQUI <<<
-        // Antes de renderizar o dashboard, confirme que o usuário está logado.
-        // Sugestão:
-        //   session_start();
-        //   if (!isset($_SESSION['user_id'])) {
-        //       header('Location: index.php');
-        //       exit;
-        //   }
+        session_start(); // Preciso ver uma forma de startar a sessão uma vez no código
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: login.php');
+            exit;
+        }
 
-        // Por ora, passa um nome genérico para a view (substitua pelo dado da sessão depois)
-        $userName = 'Visitante';
+        $userName = $_SESSION['user_name'] ?? 'Visitante';
 
         require_once __DIR__ . '/../views/dashboard.php';
     }
@@ -73,7 +73,7 @@ class AuthController
         // >>> IMPLEMENTE O LOGOUT AQUI <<<
         // Sugestão:
         //   session_start();
-        //   session_destroy();
+        session_destroy();
 
         header('Location: index.php');
         exit;

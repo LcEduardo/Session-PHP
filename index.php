@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // PONTO DE ENTRADA: tela de login
 // Todo o fluxo começa aqui
