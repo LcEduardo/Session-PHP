@@ -1,5 +1,6 @@
 <?php
 
+
 require_once __DIR__ . '/../repositories/UserRepository.php';
 
 // CONTROLLER: orquestra o fluxo entre a View e o Repository
@@ -57,7 +58,7 @@ class AuthController
 
     public function dashboard(): void
     {
-        session_start(); // Preciso ver uma forma de startar a sessão uma vez no código
+        // session_start(); // Preciso ver uma forma de startar a sessão uma vez no código
         if (!isset($_SESSION['user_id'])) {
             header('Location: login.php');
             exit;
@@ -70,9 +71,7 @@ class AuthController
 
     public function logout(): void
     {
-        // >>> IMPLEMENTE O LOGOUT AQUI <<<
-        // Sugestão:
-        //   session_start();
+        session_unset();
         session_destroy();
 
         header('Location: index.php');

@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // PONTO DE ENTRADA: área interna (protegida)
 
