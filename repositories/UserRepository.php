@@ -29,4 +29,12 @@ class UserRepository
 
         return new User($row['id'], $row['name'], $row['email'], $row['password']);
     }
+
+    public function updatePassword(int $id, string $hashedPassword): void
+    {
+        $stmt = $this->db->prepare('UPDATE users SET password = :password WHERE id = :id');
+        $stmt->bindValue(':password', $hashedPassword);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
 }

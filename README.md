@@ -78,6 +78,23 @@ Os três pontos marcados com `>>> IMPLEMENTE` no `controllers/AuthController.php
 
 ---
 
+## Rehash de senha no login
+
+Algoritmos de hash evoluem com o tempo — parâmetros mudam, vulnerabilidades são descobertas, e versões mais seguras surgem. Se você simplesmente trocar o algoritmo padrão, todos os hashes antigos no banco continuam funcionando (porque `password_verify` ainda os aceita), mas nunca são atualizados.
+
+A solução é aproveitar o momento em que o usuário já digitou a senha correta — único momento em que temos acesso ao valor em texto plano — para verificar se o hash precisa ser atualizado e, se precisar, salvar o novo.
+
+```
+Login válido
+  → password_needs_rehash($hash, PASSWORD_ARGON2ID)?
+      → sim: gera novo hash + salva no banco (transparente para o usuário)
+      → não: segue normalmente
+```
+
+Isso garante que a base migra gradualmente para o algoritmo mais atual **sem forçar um reset de senhas** e sem nenhuma interrupção para o usuário.
+
+---
+
 ## Arquitetura
 
 ```

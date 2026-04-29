@@ -41,16 +41,15 @@ class AuthController
             return;
         }
 
+        // Se o hash não usa o algoritmo mais atual (PASSWORD_ARGON2ID), regera e persiste
+        if (password_needs_rehash($user->getPassword(), PASSWORD_ARGON2ID)) {
+            $newHash = password_hash($password, PASSWORD_ARGON2ID);
+            $this->userRepository->updatePassword($user->getId(), $newHash);
+        }
+
         // como em index.php eu iniciei a sessão e chamei esse método ele já usou nessa requisição
         $_SESSION['user_id'] = $user->getId();
         $_SESSION['user_name'] = $user->getName();
-
-        // ✅ LOGIN VÁLIDO
-        // >>> IMPLEMENTE A SESSÃO AQUI <<<
-        // Sugestão:
-        //   
-        //   $_SESSION['user_id']   = $user->getId();
-        //   $_SESSION['user_name'] = $user->getName();
 
         header('Location: dashboard.php');
         exit;
