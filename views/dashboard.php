@@ -14,7 +14,7 @@
 <body>
     <header>
         <!-- >>> Após implementar a sessão, exiba o nome real: $_SESSION['user_name'] -->
-        <span>Olá, <?= htmlspecialchars($userName) ?>!</span>
+        <span>Olá, <?= $_SESSION['user_name'] ?? 'Usuário' ?>!</span>
         <a class="logout" href="logout.php">Sair</a>
     </header>
 

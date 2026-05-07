@@ -108,3 +108,54 @@ index.php / dashboard.php / logout.php   ← pontos de entrada
         |
    User (Model)                          ← entidade de dados
 ```
+## __DIR__ nos includes
+
+`__DIR__` é uma constante mágica do PHP que resolve, em tempo de compilação, para o diretório do **arquivo onde a linha está escrita** — não para a raiz do projeto, e não para o diretório de quem invocou o PHP.
+
+Por isso:
+
+```php
+require_once __DIR__ . '/../views/login.php';
+```
+
+funciona igual independentemente de quem incluiu o arquivo (entry point na raiz, teste em `tests/`, CLI rodando de qualquer pasta). O include deixa de depender do *current working directory*.
+
+### Sutileza em constantes de classe
+
+Quando `__DIR__` aparece numa `const` de classe, ele vale o diretório do arquivo **onde a constante foi declarada** — não o do filho que herdou. Foi exatamente o que causou o bug inicial: `__DIR__ . '/../../views/'` em `controllers/ControllerWithHtml.php` apontava para um nível acima da raiz do projeto. O correto é `__DIR__ . '/../views/'`.
+
+---
+
+## Classe-pai `ControllerWithHtml`
+
+A regra de "como uma view é renderizada" fica num único lugar:
+
+```php
+protected function renderTemplate(string $templateName): void
+{
+    require_once self::TEMPLATE_PATH . $templateName . '.php';
+}
+```
+
+E os controllers filhos só dizem **o quê**, não **como**:
+
+```php
+$this->renderTemplate('login');     // não precisa saber onde fica a pasta
+$this->renderTemplate('dashboard'); // nem a extensão
+```
+
+### Ganhos práticos
+
+1. **Mudança centralizada** — mover a pasta `views/` vira uma alteração de 1 linha.
+2. **API mais limpa** — `renderTemplate('login')` é mais expressivo que `require_once __DIR__ . '/../views/login.php'`.
+3. **Espaço pra evoluir** — amanhã você pode envolver tudo num layout sem mexer em controller nenhum:
+
+   ```php
+   protected function renderTemplate(string $name): void {
+       require self::TEMPLATE_PATH . 'header.php';
+       require self::TEMPLATE_PATH . $name . '.php';
+       require self::TEMPLATE_PATH . 'footer.php';
+   }
+   ```
+4. **Testabilidade** — fica fácil sobrescrever em testes (mock da renderização).
+5. **Encapsulamento** — `TEMPLATE_PATH` é `private const`, então ninguém de fora consegue depender desse caminho. Detalhe interno fica interno.

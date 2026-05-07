@@ -2,11 +2,12 @@
 
 
 require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../controllers/ControllerWithHtml.php';
 
 // CONTROLLER: orquestra o fluxo entre a View e o Repository
 // Recebe os dados do formulário, valida, e decide o que exibir/redirecionar
 
-class AuthController
+class AuthController extends ControllerWithHtml
 {
     private UserRepository $userRepository;
 
@@ -19,7 +20,8 @@ class AuthController
     {
         // Se o formulário ainda não foi enviado, apenas exibe a tela de login
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            require_once __DIR__ . '/../views/login.php';
+            $this->renderTemplate('login');
+            //require_once __DIR__ . '/../views/login.php';
             return;
         }
 
@@ -28,7 +30,7 @@ class AuthController
 
         if (empty($email) || empty($password)) {
             $error = 'Preencha e-mail e senha.';
-            require_once __DIR__ . '/../views/login.php';
+            $this->renderTemplate('login');
             return;
         }
 
@@ -37,7 +39,7 @@ class AuthController
         // Verifica se o usuário existe e se a senha confere
         if ($user === null || !password_verify($password, $user->getPassword())) {
             $error = 'E-mail ou senha inválidos.';
-            require_once __DIR__ . '/../views/login.php';
+            $this->renderTemplate('login');
             return;
         }
 
@@ -65,7 +67,8 @@ class AuthController
 
         $userName = $_SESSION['user_name'] ?? 'Visitante';
 
-        require_once __DIR__ . '/../views/dashboard.php';
+        $this->renderTemplate('dashboard', ['userName' => $userName]);
+        //require_once __DIR__ . '/../views/dashboard.php';
     }
 
     public function logout(): void
